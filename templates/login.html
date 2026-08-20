@@ -1,28 +1,63 @@
 {% extends "base.html" %}
+
 {% block title %}Login - Campus Safety Logger{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
 
 {% block content %}
+
 <div class="auth-wrapper">
+
     <div class="auth-card">
+
         <div class="auth-logo">🛡️</div>
+
         <h1>Campus Safety Logger</h1>
+
         <p class="muted">Login to continue</p>
 
         <form method="POST" action="{{ url_for('login') }}">
+
             <label for="username">Username</label>
-            <input id="username" name="username" type="text" required autocomplete="username">
+
+            <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                autocomplete="username"
+                placeholder="Enter your username"
+            >
 
             <label for="password">Password</label>
-            <input id="password" name="password" type="password" required autocomplete="current-password">
 
-            <button class="btn primary full" type="submit">Login</button>
+            <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                autocomplete="current-password"
+                placeholder="Enter your password"
+            >
+
+            <button
+                class="btn primary full"
+                type="submit"
+            >
+                Login
+            </button>
+
         </form>
 
         <p class="auth-footer">
             Don't have an account?
             <a href="{{ url_for('register') }}">Create Account</a>
         </p>
+
     </div>
+
 </div>
+
 {% endblock %}
