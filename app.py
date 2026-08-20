@@ -340,6 +340,7 @@ def framework():
 def manager_dashboard():
     db = get_db()
 
+    # Count ALL incidents
     stats = db.execute("""
         SELECT
             COUNT(*) AS total,
@@ -350,64 +351,107 @@ def manager_dashboard():
         FROM incidents
     """).fetchone()
 
+    # Show latest incidents from EVERY user
+    # LEFT JOIN is important so no incident disappears
     recent = db.execute("""
-        SELECT incidents.*, users.username AS reporter
+        SELECT
+            incidents.*,
+            COALESCE(users.username, 'Unknown User') AS reporter
         FROM incidents
-        JOIN users ON users.id = incidents.reported_by
+        LEFT JOIN users
+            ON users.id = incidents.reported_by
         ORDER BY incidents.id DESC
         LIMIT 10
     """).fetchall()
 
     db.close()
-    return render_template("manager/dashboard.html", stats=stats, recent=recent)
+
+    return render_template(
+        "manager/dashboard.html",
+        stats=stats,
+        recent=recent
+    )
 
 
 @app.route("/manager/incidents")
 @manager_required
 def manager_incidents():
+
     status = request.args.get("status", "").strip()
     priority = request.args.get("priority", "").strip()
     incident_type = request.args.get("incident_type", "").strip()
     search = request.args.get("search", "").strip()
 
+    # IMPORTANT:
+    # LEFT JOIN makes sure ALL incidents are visible to admin/manager.
     query = """
-        SELECT incidents.*, users.username AS reporter
+        SELECT
+            incidents.*,
+            COALESCE(users.username, 'Unknown User') AS reporter
         FROM incidents
-        JOIN users ON users.id = incidents.reported_by
+        LEFT JOIN users
+            ON users.id = incidents.reported_by
         WHERE 1=1
     """
+
     params = []
 
+    # Status filter
     if status:
         query += " AND incidents.status = ?"
         params.append(status)
 
+    # Priority filter
     if priority:
         query += " AND incidents.priority = ?"
         params.append(priority)
 
+    # Incident type filter
     if incident_type:
         query += " AND incidents.incident_type = ?"
         params.append(incident_type)
 
+    # Search
     if search:
         query += """
             AND (
                 incidents.location LIKE ?
                 OR incidents.description LIKE ?
-                OR users.username LIKE ?
+                OR incidents.incident_type LIKE ?
+                OR COALESCE(users.username, '') LIKE ?
             )
         """
-        term = f"%{search}%"
-        params.extend([term, term, term])
 
-    query += " ORDER BY incidents.id DESC"
+        term = f"%{search}%"
+
+        params.extend([
+            term,
+            term,
+            term,
+            term
+        ])
+
+    query += """
+        ORDER BY incidents.id DESC
+    """
 
     db = get_db()
-    incidents = db.execute(query, params).fetchall()
-    types = db.execute(
-        "SELECT DISTINCT incident_type FROM incidents ORDER BY incident_type"
+
+    # Get ALL matching incidents
+    incidents = db.execute(
+        query,
+        params
     ).fetchall()
+
+    # Incident types for filter dropdown
+    types = db.execute("""
+        SELECT DISTINCT incident_type
+        FROM incidents
+        WHERE incident_type IS NOT NULL
+          AND incident_type != ''
+        ORDER BY incident_type
+    """).fetchall()
+
     db.close()
 
     return render_template(
@@ -424,75 +468,171 @@ def manager_incidents():
 @app.route("/manager/incident/<int:incident_id>", methods=["GET", "POST"])
 @manager_required
 def incident_detail(incident_id):
+
     db = get_db()
 
+    # ---------------- UPDATE INCIDENT ----------------
+
     if request.method == "POST":
-        new_status = request.form.get("status", "Pending")
-        new_priority = request.form.get("priority", "Medium")
-        remarks = request.form.get("manager_remarks", "").strip()
+
+        new_status = request.form.get(
+            "status",
+            "Pending"
+        )
+
+        new_priority = request.form.get(
+            "priority",
+            "Medium"
+        )
+
+        remarks = request.form.get(
+            "manager_remarks",
+            ""
+        ).strip()
 
         incident = db.execute(
-            "SELECT * FROM incidents WHERE id = ?", (incident_id,)
+            """
+            SELECT *
+            FROM incidents
+            WHERE id = ?
+            """,
+            (incident_id,)
         ).fetchone()
 
         if not incident:
+
             db.close()
-            flash("Incident not found.", "danger")
-            return redirect(url_for("manager_incidents"))
+
+            flash(
+                "Incident not found.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("manager_incidents")
+            )
 
         old_status = incident["status"]
 
-        db.execute("""
+        # Update incident
+        db.execute(
+            """
             UPDATE incidents
-            SET status = ?, priority = ?, manager_remarks = ?, updated_at = ?
+            SET
+                status = ?,
+                priority = ?,
+                manager_remarks = ?,
+                updated_at = ?
             WHERE id = ?
-        """, (
-            new_status,
-            new_priority,
-            remarks,
-            datetime.now().isoformat(timespec="seconds"),
-            incident_id
-        ))
+            """,
+            (
+                new_status,
+                new_priority,
+                remarks,
+                datetime.now().isoformat(
+                    timespec="seconds"
+                ),
+                incident_id
+            )
+        )
 
-        db.execute("""
+        # Save decision/update history
+        db.execute(
+            """
             INSERT INTO incident_updates
-            (incident_id, updated_by, old_status, new_status, remarks, created_at)
+            (
+                incident_id,
+                updated_by,
+                old_status,
+                new_status,
+                remarks,
+                created_at
+            )
             VALUES (?, ?, ?, ?, ?, ?)
-        """, (
-            incident_id,
-            session["user_id"],
-            old_status,
-            new_status,
-            remarks,
-            datetime.now().isoformat(timespec="seconds")
-        ))
+            """,
+            (
+                incident_id,
+                session["user_id"],
+                old_status,
+                new_status,
+                remarks,
+                datetime.now().isoformat(
+                    timespec="seconds"
+                )
+            )
+        )
 
         db.commit()
+
         db.close()
 
-        flash("Incident updated successfully.", "success")
-        return redirect(url_for("incident_detail", incident_id=incident_id))
+        flash(
+            "Incident updated successfully.",
+            "success"
+        )
 
-    incident = db.execute("""
-        SELECT incidents.*, users.username AS reporter
+        return redirect(
+            url_for(
+                "incident_detail",
+                incident_id=incident_id
+            )
+        )
+
+
+    # ---------------- GET FULL INCIDENT ----------------
+
+    # LEFT JOIN ensures the report is still accessible
+    # even if the user record has a problem.
+    incident = db.execute(
+        """
+        SELECT
+            incidents.*,
+            COALESCE(
+                users.username,
+                'Unknown User'
+            ) AS reporter
         FROM incidents
-        JOIN users ON users.id = incidents.reported_by
+        LEFT JOIN users
+            ON users.id = incidents.reported_by
         WHERE incidents.id = ?
-    """, (incident_id,)).fetchone()
+        """,
+        (incident_id,)
+    ).fetchone()
 
-    updates = db.execute("""
-        SELECT incident_updates.*, users.username AS updater
+
+    # Get complete decision/update history
+    updates = db.execute(
+        """
+        SELECT
+            incident_updates.*,
+            COALESCE(
+                users.username,
+                'Unknown User'
+            ) AS updater
         FROM incident_updates
-        JOIN users ON users.id = incident_updates.updated_by
+        LEFT JOIN users
+            ON users.id = incident_updates.updated_by
         WHERE incident_updates.incident_id = ?
         ORDER BY incident_updates.id DESC
-    """, (incident_id,)).fetchall()
+        """,
+        (incident_id,)
+    ).fetchall()
+
 
     db.close()
 
+
     if not incident:
-        flash("Incident not found.", "danger")
-        return redirect(url_for("manager_incidents"))
+
+        flash(
+            "Incident not found.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("manager_incidents")
+        )
+
 
     return render_template(
         "manager/incident_detail.html",
@@ -504,32 +644,62 @@ def incident_detail(incident_id):
 @app.route("/manager/analytics")
 @manager_required
 def analytics():
+
     db = get_db()
 
-    status_data = db.execute("""
-        SELECT status, COUNT(*) AS count
-        FROM incidents GROUP BY status
-    """).fetchall()
+    # Status analytics
+    status_data = db.execute(
+        """
+        SELECT
+            status,
+            COUNT(*) AS count
+        FROM incidents
+        GROUP BY status
+        """
+    ).fetchall()
 
-    priority_data = db.execute("""
-        SELECT priority, COUNT(*) AS count
-        FROM incidents GROUP BY priority
-    """).fetchall()
 
-    type_data = db.execute("""
-        SELECT incident_type, COUNT(*) AS count
-        FROM incidents GROUP BY incident_type
+    # Priority analytics
+    priority_data = db.execute(
+        """
+        SELECT
+            priority,
+            COUNT(*) AS count
+        FROM incidents
+        GROUP BY priority
+        """
+    ).fetchall()
+
+
+    # Incident type analytics
+    type_data = db.execute(
+        """
+        SELECT
+            incident_type,
+            COUNT(*) AS count
+        FROM incidents
+        GROUP BY incident_type
         ORDER BY count DESC
-    """).fetchall()
+        """
+    ).fetchall()
 
-    location_data = db.execute("""
-        SELECT location, COUNT(*) AS count
-        FROM incidents GROUP BY location
+
+    # Location analytics
+    location_data = db.execute(
+        """
+        SELECT
+            location,
+            COUNT(*) AS count
+        FROM incidents
+        GROUP BY location
         ORDER BY count DESC
         LIMIT 10
-    """).fetchall()
+        """
+    ).fetchall()
+
 
     db.close()
+
 
     return render_template(
         "manager/analytics.html",
@@ -539,6 +709,9 @@ def analytics():
         location_data=location_data
     )
 
-
 if __name__ == "__main__":
-    app.run(debug=True, host="127.0.0.1", port=5000)
+    app.run(
+        debug=True,
+        host="127.0.0.1",
+        port=5000
+    )
