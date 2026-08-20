@@ -2,11 +2,23 @@ import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-DATABASE_PATH = "/tmp/campus_safety.db"
 
-SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret-key-for-production")
+# Local database path
+DATABASE_PATH = str(
+    BASE_DIR / "database" / "campus_safety.db"
+)
 
-# Default manager login.
-# Change these values before real deployment.
-DEFAULT_MANAGER_USERNAME = os.getenv("MANAGER_USERNAME", "ADMIN")
-DEFAULT_MANAGER_PASSWORD = os.getenv("MANAGER_PASSWORD", "PASSWORD")
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "campus-safety-secret-key-change-this"
+)
+
+DEFAULT_MANAGER_USERNAME = os.getenv(
+    "MANAGER_USERNAME",
+    "manager"
+)
+
+DEFAULT_MANAGER_PASSWORD = os.getenv(
+    "MANAGER_PASSWORD",
+    "manager123"
+)
