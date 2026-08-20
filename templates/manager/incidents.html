@@ -1,76 +1,269 @@
 {% extends "base.html" %}
+
 {% block title %}All Incidents{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/manager.css') }}">{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/manager.css') }}">
+{% endblock %}
 
 {% block content %}
+
 <div class="page-header">
     <div>
         <p class="eyebrow">INCIDENT MANAGEMENT</p>
+
         <h1>All Incident Reports</h1>
-        <p class="muted">Every submitted incident is visible to the manager.</p>
+
+        <p class="muted">
+            Every submitted incident is visible to the manager.
+        </p>
     </div>
 </div>
+
+
+<!-- FILTERS -->
 
 <form class="filter-card" method="GET">
-    <input name="search" value="{{ search }}" placeholder="Search location, description or user...">
+
+    <input
+        type="text"
+        name="search"
+        value="{{ search }}"
+        placeholder="Search location, description or user..."
+    >
 
     <select name="priority">
+
         <option value="">All Priorities</option>
+
         {% for p in ['Low', 'Medium', 'High', 'Critical'] %}
-            <option value="{{ p }}" {% if selected_priority == p %}selected{% endif %}>{{ p }}</option>
+
+        <option
+            value="{{ p }}"
+            {% if selected_priority == p %}selected{% endif %}
+        >
+            {{ p }}
+        </option>
+
         {% endfor %}
+
     </select>
+
 
     <select name="status">
+
         <option value="">All Statuses</option>
+
         {% for s in ['Pending', 'Under Review', 'In Progress', 'Resolved', 'Rejected'] %}
-            <option value="{{ s }}" {% if selected_status == s %}selected{% endif %}>{{ s }}</option>
+
+        <option
+            value="{{ s }}"
+            {% if selected_status == s %}selected{% endif %}
+        >
+            {{ s }}
+        </option>
+
         {% endfor %}
+
     </select>
+
 
     <select name="incident_type">
+
         <option value="">All Types</option>
+
         {% for t in types %}
-            <option value="{{ t.incident_type }}" {% if selected_type == t.incident_type %}selected{% endif %}>{{ t.incident_type }}</option>
+
+        <option
+            value="{{ t.incident_type }}"
+            {% if selected_type == t.incident_type %}selected{% endif %}
+        >
+            {{ t.incident_type }}
+        </option>
+
         {% endfor %}
+
     </select>
 
-    <button class="btn primary" type="submit">Filter</button>
-    <a class="btn secondary" href="{{ url_for('manager_incidents') }}">Clear</a>
+
+    <button
+        class="btn primary"
+        type="submit"
+    >
+        Filter
+    </button>
+
+
+    <a
+        class="btn secondary"
+        href="{{ url_for('manager_incidents') }}"
+    >
+        Clear
+    </a>
+
 </form>
 
+
+<!-- INCIDENT TABLE -->
+
 <div class="table-card">
+
     <div class="table-wrap">
+
         <table>
+
             <thead>
+
                 <tr>
+
                     <th>ID</th>
-                    <th>Reporter</th>
-                    <th>Type</th>
-                    <th>Location</th>
-                    <th>Priority</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th></th>
+
+                    <th>REPORTER</th>
+
+                    <th>TYPE</th>
+
+                    <th>LOCATION</th>
+
+                    <th>DESCRIPTION</th>
+
+                    <th>PRIORITY</th>
+
+                    <th>STATUS</th>
+
+                    <th>CREATED</th>
+
+                    <th>ACTION</th>
+
                 </tr>
+
             </thead>
+
+
             <tbody>
+
             {% for incident in incidents %}
+
                 <tr>
-                    <td>#{{ incident.id }}</td>
-                    <td>{{ incident.reporter }}</td>
-                    <td>{{ incident.incident_type }}</td>
-                    <td>{{ incident.location }}</td>
-                    <td><span class="badge {{ incident.priority|lower }}">{{ incident.priority }}</span></td>
-                    <td><span class="status {{ incident.status|lower|replace(' ', '-') }}">{{ incident.status }}</span></td>
-                    <td>{{ incident.created_at }}</td>
-                    <td><a class="table-link" href="{{ url_for('incident_detail', incident_id=incident.id) }}">Details</a></td>
+
+                    <!-- ID -->
+
+                    <td>
+                        #{{ incident.id }}
+                    </td>
+
+
+                    <!-- REPORTER -->
+
+                    <td>
+                        {{ incident.reporter }}
+                    </td>
+
+
+                    <!-- TYPE -->
+
+                    <td>
+                        {{ incident.incident_type }}
+                    </td>
+
+
+                    <!-- LOCATION -->
+
+                    <td>
+                        {{ incident.location }}
+                    </td>
+
+
+                    <!-- DESCRIPTION -->
+
+                    <td class="incident-description">
+
+                        {% if incident.description %}
+
+                            <div class="description-text">
+                                {{ incident.description }}
+                            </div>
+
+                        {% else %}
+
+                            <span class="no-description">
+                                No description provided
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- PRIORITY -->
+
+                    <td>
+
+                        <span
+                            class="badge {{ incident.priority|lower }}"
+                        >
+                            {{ incident.priority }}
+                        </span>
+
+                    </td>
+
+
+                    <!-- STATUS -->
+
+                    <td>
+
+                        <span
+                            class="status {{ incident.status|lower|replace(' ', '-') }}"
+                        >
+                            {{ incident.status }}
+                        </span>
+
+                    </td>
+
+
+                    <!-- CREATED -->
+
+                    <td>
+                        {{ incident.created_at }}
+                    </td>
+
+
+                    <!-- DETAILS -->
+
+                    <td>
+
+                        <a
+                            class="table-link"
+                            href="{{ url_for('incident_detail', incident_id=incident.id) }}"
+                        >
+                            View Details
+                        </a>
+
+                    </td>
+
                 </tr>
+
+
             {% else %}
-                <tr><td colspan="8" class="empty">No matching incidents found.</td></tr>
+
+                <tr>
+
+                    <td
+                        colspan="9"
+                        class="empty"
+                    >
+                        No matching incidents found.
+                    </td>
+
+                </tr>
+
             {% endfor %}
+
             </tbody>
+
         </table>
+
     </div>
+
 </div>
+
 {% endblock %}

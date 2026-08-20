@@ -1,100 +1,38 @@
-.critical-stat strong { color: #b11d1d; }
+/* Incident Description */
 
-.card-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 20px 10px;
+.incident-description {
+    min-width: 280px;
+    max-width: 450px;
+    white-space: normal;
+    vertical-align: top;
 }
 
-.card-heading h2 { margin: 0; }
-
-.filter-card {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr auto auto;
-    gap: 10px;
-    background: white;
-    border: 1px solid #e2e7ef;
-    padding: 15px;
-    border-radius: 14px;
-    margin-bottom: 18px;
+.description-text {
+    line-height: 1.5;
+    color: #4f5c72;
+    word-break: break-word;
 }
 
-.detail-grid {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 20px;
-    margin-bottom: 20px;
+.no-description {
+    color: #9aa3b2;
+    font-style: italic;
 }
 
-.detail-card { padding: 25px; }
 
-.detail-card h2 { margin-top: 0; }
+/* Better incident table */
 
-.detail-card label { margin-top: 18px; }
-
-.detail-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 13px 0;
-    border-bottom: 1px solid #e2e7ef;
+.table-wrap {
+    overflow-x: auto;
 }
 
-.detail-row span { color: #687386; }
-
-.description-box {
-    margin-top: 20px;
-    padding: 17px;
-    background: #f7f9fc;
-    border-radius: 10px;
+.table-wrap table {
+    min-width: 1200px;
 }
 
-.description-box span {
-    font-weight: 800;
-    font-size: 13px;
+.table-wrap th {
+    white-space: nowrap;
 }
 
-.description-box p {
-    line-height: 1.7;
-    margin-bottom: 0;
-}
-
-.ai-box {
-    margin-top: 20px;
-    padding: 18px;
-    border-radius: 10px;
-    background: #eef3ff;
-    border: 1px solid #dbe5ff;
-}
-
-.ai-box h3 { margin-top: 0; }
-
-.charts-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.chart-card {
-    padding: 20px;
-    min-height: 330px;
-}
-
-.chart-card h2 {
-    margin-top: 0;
-    font-size: 18px;
-}
-
-.chart-card canvas {
-    max-height: 260px;
-}
-
-@media (max-width: 1000px) {
-    .filter-card { grid-template-columns: 1fr 1fr; }
-    .detail-grid, .charts-grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 600px) {
-    .filter-card { grid-template-columns: 1fr; }
+.table-wrap td {
+    vertical-align: top;
 }
