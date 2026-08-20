@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/manager.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <p class="eyebrow">ADMIN CONTROL CENTER</p>
+        <h1>Safety Operations Dashboard</h1>
+        <p class="muted">Review campus incidents and manage their resolution.</p>
+    </div>
+    <a class="btn primary" href="{{ url_for('manager_incidents') }}">View All Incidents</a>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card"><span>Total Incidents</span><strong>{{ stats.total or 0 }}</strong></div>
+    <div class="stat-card"><span>Pending</span><strong>{{ stats.pending or 0 }}</strong></div>
+    <div class="stat-card"><span>High Priority</span><strong>{{ stats.high or 0 }}</strong></div>
+    <div class="stat-card critical-stat"><span>Critical</span><strong>{{ stats.critical or 0 }}</strong></div>
+    <div class="stat-card"><span>Resolved</span><strong>{{ stats.resolved or 0 }}</strong></div>
+</div>
+
+<div class="table-card">
+    <div class="card-heading">
+        <h2>Recent Incidents</h2>
+        <a href="{{ url_for('manager_incidents') }}">See all →</a>
+    </div>
+
+    {% if recent %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Reporter</th>
+                    <th>Type</th>
+                    <th>Location</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for incident in recent %}
+                <tr>
+                    <td>#{{ incident.id }}</td>
+                    <td>{{ incident.reporter }}</td>
+                    <td>{{ incident.incident_type }}</td>
+                    <td>{{ incident.location }}</td>
+                    <td><span class="badge {{ incident.priority|lower }}">{{ incident.priority }}</span></td>
+                    <td><span class="status {{ incident.status|lower|replace(' ', '-') }}">{{ incident.status }}</span></td>
+                    <td><a class="table-link" href="{{ url_for('incident_detail', incident_id=incident.id) }}">Open</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="empty">No incidents have been reported.</div>
+    {% endif %}
+</div>
+{% endblock %}

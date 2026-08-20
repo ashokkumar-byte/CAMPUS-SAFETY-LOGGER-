@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}FRAME WORK - Campus Safety Logger{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/framework.css') }}">{% endblock %}
+{% block content %}
+<div class="framework-header"><p class="eyebrow">PROJECT TECHNOLOGY</p><h1>FRAME WORK</h1><p>Programming languages, frameworks, tools and subjects used to build the Campus Safety Logger.</p></div>
+<div class="framework-grid">
+<section class="framework-card"><div class="number">01</div><h2>Programming Languages</h2><ul><li><strong>Python</strong> — backend</li><li><strong>HTML</strong> — page structure</li><li><strong>CSS</strong> — styling and responsive UI</li><li><strong>JavaScript</strong> — browser interaction and charts</li><li><strong>SQL</strong> — SQLite queries</li></ul></section>
+<section class="framework-card"><div class="number">02</div><h2>Frameworks & Libraries</h2><ul><li><strong>Flask</strong> — Python web framework</li><li><strong>Werkzeug</strong> — password hashing</li><li><strong>Chart.js</strong> — analytics charts</li></ul></section>
+<section class="framework-card"><div class="number">03</div><h2>Database & Data</h2><ul><li><strong>SQLite</strong> relational database</li><li>Users, incidents and update-history tables</li><li>CRUD operations and SQL filtering</li><li>Role-based data access</li></ul></section>
+<section class="framework-card"><div class="number">04</div><h2>AI / LLM</h2><ul><li>Incident description analysis</li><li>Priority recommendation</li><li>Incident summary</li><li>Safety recommendation</li><li>LLM service layer for future API integration</li></ul></section>
+<section class="framework-card"><div class="number">05</div><h2>Web Development Concepts</h2><ul><li>Client-server architecture</li><li>Flask routing and HTTP requests</li><li>HTML forms</li><li>Sessions and authentication</li><li>Role-based access control</li><li>Responsive web design</li></ul></section>
+<section class="framework-card"><div class="number">06</div><h2>Subjects Involved</h2><ul><li>Python Programming</li><li>Web Technologies</li><li>Database Management Systems (DBMS)</li><li>SQL</li><li>Software Engineering</li><li>Authentication & Authorization</li><li>Data validation and error handling</li><li>Data analytics and decision support</li></ul></section>
+<section class="framework-card wide"><div class="number">07</div><h2>Project Process</h2><div class="process-flow"><span>Register</span><b>→</b><span>Login</span><b>→</b><span>Report Incident</span><b>→</b><span>SQLite</span><b>→</b><span>Smart Analysis</span><b>→</b><span>Manager Review</span><b>→</b><span>Decision / Status</span><b>→</b><span>User Views Decision</span></div></section>
+</div>{% endblock %}

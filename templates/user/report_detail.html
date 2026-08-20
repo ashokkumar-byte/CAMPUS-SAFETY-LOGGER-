@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Report #{{ incident.id }}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">{% endblock %}
+{% block content %}
+<div class="page-header">
+<div><p class="eyebrow">MY REPORT</p><h1>Incident #{{ incident.id }}</h1><p class="muted">Complete report, manager decision and update history.</p></div>
+<div>
+<a class="btn secondary" href="{{ url_for('edit_report', incident_id=incident.id) }}">Edit</a>
+<a class="btn secondary" href="{{ url_for('my_reports') }}">← Back to My Reports</a>
+</div>
+</div>
+<div class="detail-grid-user">
+<section class="detail-card-user"><h2>Incident Information</h2>
+<div class="detail-row-user"><span>Incident Type</span><strong>{{ incident.incident_type }}</strong></div>
+<div class="detail-row-user"><span>Location</span><strong>{{ incident.location }}</strong></div>
+<div class="detail-row-user"><span>Priority</span><strong><span class="badge {{ incident.priority|lower }}">{{ incident.priority }}</span></strong></div>
+<div class="detail-row-user"><span>Status</span><strong><span class="status {{ incident.status|lower|replace(' ', '-') }}">{{ incident.status }}</span></strong></div>
+<div class="detail-row-user"><span>Submitted</span><strong>{{ incident.created_at }}</strong></div>
+<div class="description-box-user"><span>Your Description</span><p>{{ incident.description }}</p></div></section>
+<section class="detail-card-user"><h2>Manager Decision</h2>
+{% if incident.manager_remarks %}<div class="decision-box"><strong>Manager Remarks</strong><p>{{ incident.manager_remarks }}</p></div>
+{% else %}<div class="pending-box"><strong>Decision pending</strong><p>The manager has not added a decision or remarks yet.</p></div>{% endif %}
+<div class="ai-box"><h3>Smart Analysis</h3><p><strong>Summary:</strong> {{ incident.llm_summary or 'Not available.' }}</p><p><strong>Recommendation:</strong> {{ incident.llm_recommendation or 'Not available.' }}</p></div>
+</section></div>
+<div class="table-card"><div class="card-heading"><h2>Decision / Update History</h2></div>
+{% if updates %}<div class="table-wrap"><table><thead><tr><th>Updated By</th><th>Previous Status</th><th>New Status</th><th>Manager Remarks</th><th>Date</th></tr></thead><tbody>
+{% for update in updates %}<tr><td>{{ update.updater }}</td><td>{{ update.old_status }}</td><td>{{ update.new_status }}</td><td>{{ update.remarks or '-' }}</td><td>{{ update.created_at }}</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="empty">No manager updates yet.</div>{% endif %}</div>
+{% endblock %}

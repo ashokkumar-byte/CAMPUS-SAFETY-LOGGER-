@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Report Incident{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">SAFETY REPORT</p>
+            <h1>Report an Incident</h1>
+            <p class="muted">Give clear and accurate information.</p>
+        </div>
+    </div>
+
+    <form class="form-card" method="POST">
+        <div class="form-grid">
+            <div>
+                <label for="incident_type">Incident Type</label>
+                <select id="incident_type" name="incident_type" required>
+                    <option value="">Select type</option>
+                    <option>Security</option>
+                    <option>Medical</option>
+                    <option>Fire</option>
+                    <option>Electrical</option>
+                    <option>Harassment</option>
+                    <option>Infrastructure</option>
+                    <option>Accident</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="location">Location</label>
+                <input id="location" name="location" type="text" placeholder="Example: Hostel Block A" required>
+            </div>
+        </div>
+
+        <label for="description">Incident Description</label>
+        <textarea id="description" name="description" rows="7" placeholder="Describe what happened..." required></textarea>
+
+        <div class="info-box">
+            <strong>Smart analysis:</strong>
+            The system will automatically suggest a priority and provide a short recommendation for the manager.
+        </div>
+
+        <button class="btn primary" type="submit">Submit Incident</button>
+        <a class="btn secondary" href="{{ url_for('user_dashboard') }}">Cancel</a>
+    </form>
+</div>
+{% endblock %}

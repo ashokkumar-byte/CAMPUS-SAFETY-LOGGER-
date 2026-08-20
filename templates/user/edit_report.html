@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Edit Report #{{ incident.id }}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="page-header">
+        <div>
+            <p class="eyebrow">EDIT REPORT</p>
+            <h1>Edit Incident #{{ incident.id }}</h1>
+            <p class="muted">Update the information you submitted.</p>
+        </div>
+        <a class="btn secondary" href="{{ url_for('user_report_detail', incident_id=incident.id) }}">← Back</a>
+    </div>
+
+    <form class="form-card" method="POST">
+        <div class="form-grid">
+            <div>
+                <label for="incident_type">Incident Type</label>
+                <select id="incident_type" name="incident_type" required>
+                    {% for t in ['Security', 'Medical', 'Fire', 'Electrical', 'Harassment', 'Infrastructure', 'Accident', 'Other'] %}
+                        <option value="{{ t }}" {% if incident.incident_type == t %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="location">Location</label>
+                <input id="location" name="location" type="text" value="{{ incident.location }}" required>
+            </div>
+        </div>
+
+        <label for="description">Incident Description</label>
+        <textarea id="description" name="description" rows="7" required>{{ incident.description }}</textarea>
+
+        <div class="info-box">
+            <strong>Smart analysis:</strong>
+            Saving the report will update its smart priority, summary and recommendation.
+        </div>
+
+        <button class="btn primary" type="submit">Save Changes</button>
+        <a class="btn secondary" href="{{ url_for('user_report_detail', incident_id=incident.id) }}">Cancel</a>
+    </form>
+</div>
+{% endblock %}

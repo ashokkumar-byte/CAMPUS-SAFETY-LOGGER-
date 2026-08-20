@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/manager.css') }}">{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    window.analyticsData = {
+        status: {{ status_data|tojson }},
+        priority: {{ priority_data|tojson }},
+        type: {{ type_data|tojson }},
+        location: {{ location_data|tojson }}
+    };
+</script>
+<script src="{{ url_for('static', filename='js/manager.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <p class="eyebrow">ANALYTICS</p>
+        <h1>Safety Analytics</h1>
+        <p class="muted">Understand incident patterns and operational workload.</p>
+    </div>
+</div>
+
+<div class="charts-grid">
+    <div class="chart-card">
+        <h2>Incidents by Status</h2>
+        <canvas id="statusChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h2>Incidents by Priority</h2>
+        <canvas id="priorityChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h2>Incidents by Type</h2>
+        <canvas id="typeChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h2>Top Locations</h2>
+        <canvas id="locationChart"></canvas>
+    </div>
+</div>
+{% endblock %}

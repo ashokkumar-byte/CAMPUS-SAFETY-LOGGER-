@@ -1,0 +1,43 @@
+.auth-wrapper {
+    min-height: 82vh;
+    display: grid;
+    place-items: center;
+}
+
+.auth-card {
+    width: min(430px, 100%);
+    background: white;
+    border: 1px solid #e2e7ef;
+    border-radius: 18px;
+    padding: 35px;
+    box-shadow: 0 20px 50px rgba(22, 34, 55, 0.12);
+}
+
+.auth-card h1 {
+    margin: 10px 0 5px;
+    font-size: 26px;
+}
+
+.auth-card form {
+    margin-top: 25px;
+}
+
+.auth-card label {
+    margin-top: 16px;
+}
+
+.auth-logo {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    background: #eaf0ff;
+    border-radius: 15px;
+    font-size: 28px;
+}
+
+.auth-footer {
+    text-align: center;
+    margin: 22px 0 0;
+    color: #687386;
+}

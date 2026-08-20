@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Create Account - Campus Safety Logger{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-logo">👤</div>
+        <h1>Create Account</h1>
+        <p class="muted">Create a user account with username and password</p>
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" minlength="3" required autocomplete="username">
+
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" minlength="6" required autocomplete="new-password">
+
+            <label for="confirm_password">Confirm Password</label>
+            <input id="confirm_password" name="confirm_password" type="password" minlength="6" required autocomplete="new-password">
+
+            <button class="btn primary full" type="submit">Create Account</button>
+        </form>
+
+        <p class="auth-footer">
+            Already have an account?
+            <a href="{{ url_for('login') }}">Login</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

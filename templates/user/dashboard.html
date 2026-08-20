@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}User Dashboard{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <p class="eyebrow">USER DASHBOARD</p>
+        <h1>Welcome, {{ current_username }}</h1>
+        <p class="muted">Report campus safety incidents and track their progress.</p>
+    </div>
+    <a class="btn primary" href="{{ url_for('report_incident') }}">+ Report Incident</a>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card"><span>Total Reports</span><strong>{{ stats.total or 0 }}</strong></div>
+    <div class="stat-card"><span>Pending</span><strong>{{ stats.pending or 0 }}</strong></div>
+    <div class="stat-card"><span>In Progress</span><strong>{{ stats.in_progress or 0 }}</strong></div>
+    <div class="stat-card"><span>Resolved</span><strong>{{ stats.resolved or 0 }}</strong></div>
+</div>
+
+<div class="action-card">
+    <h2>Need to report a safety issue?</h2>
+    <p>Provide the incident type, location and description. The system will analyze the report and suggest a priority.</p>
+    <a class="btn primary" href="{{ url_for('report_incident') }}">Report Now</a>
+</div>
+{% endblock %}

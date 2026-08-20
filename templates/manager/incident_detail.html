@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Incident #{{ incident.id }}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/manager.css') }}">{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <p class="eyebrow">INCIDENT DETAILS</p>
+        <h1>Incident #{{ incident.id }}</h1>
+    </div>
+    <a class="btn secondary" href="{{ url_for('manager_incidents') }}">← Back</a>
+</div>
+
+<div class="detail-grid">
+    <section class="detail-card">
+        <h2>Report Information</h2>
+
+        <div class="detail-row"><span>Reported By</span><strong>{{ incident.reporter }}</strong></div>
+        <div class="detail-row"><span>Incident Type</span><strong>{{ incident.incident_type }}</strong></div>
+        <div class="detail-row"><span>Location</span><strong>{{ incident.location }}</strong></div>
+        <div class="detail-row"><span>Created</span><strong>{{ incident.created_at }}</strong></div>
+
+        <div class="description-box">
+            <span>Description</span>
+            <p>{{ incident.description }}</p>
+        </div>
+
+        <div class="ai-box">
+            <h3>Smart Analysis</h3>
+            <p><strong>Summary:</strong> {{ incident.llm_summary }}</p>
+            <p><strong>Recommendation:</strong> {{ incident.llm_recommendation }}</p>
+        </div>
+    </section>
+
+    <section class="detail-card">
+        <h2>Manager Action</h2>
+
+        <form method="POST">
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority">
+                {% for p in ['Low', 'Medium', 'High', 'Critical'] %}
+                    <option value="{{ p }}" {% if incident.priority == p %}selected{% endif %}>{{ p }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="status">Status</label>
+            <select id="status" name="status">
+                {% for s in ['Pending', 'Under Review', 'In Progress', 'Resolved', 'Rejected'] %}
+                    <option value="{{ s }}" {% if incident.status == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="manager_remarks">Manager Remarks</label>
+            <textarea id="manager_remarks" name="manager_remarks" rows="6" placeholder="Add your remarks...">{{ incident.manager_remarks or '' }}</textarea>
+
+            <button class="btn primary full" type="submit">Update Incident</button>
+        </form>
+    </section>
+</div>
+
+<div class="table-card">
+    <div class="card-heading"><h2>Update History</h2></div>
+    {% if updates %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Updated By</th>
+                    <th>Old Status</th>
+                    <th>New Status</th>
+                    <th>Remarks</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for update in updates %}
+                <tr>
+                    <td>{{ update.updater }}</td>
+                    <td>{{ update.old_status }}</td>
+                    <td>{{ update.new_status }}</td>
+                    <td>{{ update.remarks or '-' }}</td>
+                    <td>{{ update.created_at }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="empty">No updates yet.</div>
+    {% endif %}
+</div>
+{% endblock %}
